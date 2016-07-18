@@ -105,6 +105,24 @@ def stream(username=None):
 		template = 'user_stream.html'
 	return render_template(template, stream=stream, user=user)
 
+@app.route('/follow/<username>')
+@login_required
+def follow(username):
+	try:
+		to_user = models.User.get(models.User.username**username)
+	except models.DoesNotExist:
+		pass
+	else:
+		try:
+			models.Relationship.create(
+				from_user=g.user._get_current_object(),
+				to_user=to_user
+			)
+		except models.IntegrityError:
+			pass
+		else:
+			flash("You're now following {}!".format(to_user.username), "success")
+
 
 
 
